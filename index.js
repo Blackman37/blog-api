@@ -13,7 +13,7 @@ app.post('/tenants', async (req, res) => {
     try{
         const user = await User.create({ username, password })
 
-        return res.json(user)
+        return res.status(201).json(user)
     } catch(err) {
         console.log(err)
 
