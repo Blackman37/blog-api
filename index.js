@@ -1,5 +1,5 @@
 const express = require('express')
-const { sequelize, User } = require('./models')
+const { sequelize, User, Article } = require('./models')
 
 
 
@@ -35,6 +35,22 @@ app.get('/tenants/:tenantId', async (req, res) => {
         console.log(err)
 
         return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
+app.post('/articles', async (req, res) => {
+    const { tenantId, title, perex } = req.body
+
+    try {
+        const user = await User.findOne({ where: { tenantId: tenantId }})
+
+        const article = await Article.create({ title, perex, userId: user.id })
+
+        return res.status(201).json(article)
+    } catch(err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong '})
     }
 })
 
