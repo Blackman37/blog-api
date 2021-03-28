@@ -1,16 +1,30 @@
 const express = require('express')
-const { sequelize } = require('./models')
+const { sequelize, User } = require('./models')
 
-async function main(){
-    await sequelize.sync({ force: true })
-}
 
-main()
 
 const app = express()
+app.use(express.json())
 
-app.use('/', (req, res) => { res.send('This is working') })
 
-app.listen(3001, () => {
-    console.log('Server is listening on port 3001');
+app.post('/tenants', async(req, res) => {
+    const { username, password } = req.body
+
+    try{
+        const user = await User.create({ username, password })
+
+        return res.json(user)
+    } catch(err) {
+        console.log(err)
+
+        return res.status(500).json(err)
+    }
+})
+
+
+app.listen({ port: 3001 }, async () => {
+    console.log('Server is listening on http://localhost:3001')
+
+    await sequelize.sync({ force: true })
+    console.log('Database synced!')
 })
