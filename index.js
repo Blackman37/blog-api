@@ -22,9 +22,10 @@ app.post('/tenants', async(req, res) => {
 })
 
 
+
 app.listen({ port: 3001 }, async () => {
     console.log('Server is listening on http://localhost:3001')
 
-    await sequelize.sync({ force: true })
+    await sequelize.authenticate()
     console.log('Database synced!')
 })
