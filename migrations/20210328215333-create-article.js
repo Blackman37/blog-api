@@ -1,30 +1,40 @@
 'use strict';
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Articles', {
+  up: async (queryInterface, DataTypes) => {
+    await queryInterface.createTable('articles', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
+      },
+      articleId: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
       },
       perex: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING,
+        allowNull: false
       },
       title: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     });
   },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Articles');
+  down: async (queryInterface, DataTypes) => {
+    await queryInterface.dropTable('articles');
   }
 };
