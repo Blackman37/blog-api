@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     toJSON(){
       return { ...this.get(), id: undefined }
     }
+
   };
   User.init({
     tenantId: {
@@ -32,10 +33,18 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: { msg: 'User must have a username' },
+        notEmpty: { msg: 'Username must not be empty' }
+      }
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: { msg: 'User must have a password' },
+        notEmpty: { msg: 'Password must not be empty' }
+      }
     },
   },
     {

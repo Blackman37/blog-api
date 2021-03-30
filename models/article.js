@@ -29,10 +29,18 @@ module.exports = (sequelize, DataTypes) => {
     perex: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: { msg: 'Article must have a perex' },
+        notEmpty: { msg: 'Perex must not be empty' }
+      }
     },
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: { msg: 'Article must have a title' },
+        notEmpty : { msg: 'Title must not be empty' }
+      }
     },
   }, {
     sequelize,
