@@ -1,5 +1,7 @@
 const express = require('express')
 const { sequelize, User, Article } = require('./models')
+const article = require('./models/article')
+const user = require('./models/user')
 
 
 
@@ -65,6 +67,18 @@ app.get('/articles/:articleId', async (req, res) => {
 
         return res.json(article)
     } catch(err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
+app.get('/articles', async (req, res) => {
+    try {
+        const articles = await Article.findAll()
+
+        return res.json(articles)
+    } catch (err) {
         console.log(err)
 
         return res.status(500).json({ error: 'Something went wrong' })
