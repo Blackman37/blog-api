@@ -1,7 +1,8 @@
 const express = require('express')
-const { sequelize, User, Article } = require('./models')
+const { sequelize, User, Article, Comment } = require('./models')
 const article = require('./models/article')
 const user = require('./models/user')
+const comment = require('./models/comment')
 
 
 
@@ -131,6 +132,22 @@ app.patch('/articles/:articleId', async (req, res) => {
         console.log(err)
 
         return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
+app.post('/comment', async (req, res) => {
+    const { tenantId, content } = req.body
+
+    try {
+        const user = await User.findOne({ where: { tenantId: tenantId }})
+
+        const comment = await Comment.create({ content, userId: user.id })
+
+        return res.status(201).json(comment)
+    } catch (err) {
+        console.log(err)
+
+        return res.status(400).json(err)
     }
 })
 

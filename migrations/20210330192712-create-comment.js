@@ -1,30 +1,40 @@
 'use strict';
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Comments', {
+  up: async (queryInterface, DataTypes) => {
+    await queryInterface.createTable('comments', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
+      },
+      commentId: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
       },
       content: {
-        type: Sequelize.STRING
+          type: DataTypes.STRING,
+          allowNull: false
       },
       score: {
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       }
     });
   },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Comments');
+  down: async (queryInterface, DataTypes) => {
+    await queryInterface.dropTable('comments');
   }
 };
