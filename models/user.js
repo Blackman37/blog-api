@@ -16,9 +16,9 @@ module.exports = (sequelize, DataTypes) => {
       // this.hasMany(Article, { foreignKey: 'userId' })
     }
 
-    // toJSON(){
-    //   return { ...this.get(), id: undefined }
-    // }
+    toJSON(){
+      return { ...this.get(), id: undefined }
+    }
   };
   User.init({
     tenantId: {
