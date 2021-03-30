@@ -97,6 +97,26 @@ app.delete('/articles/:articleId', async (req, res) => {
     }
 })
 
+app.put('/articles/:articleId', async (req, res) => {
+    const articleId = req.params.articleId
+    const { title, perex } = req.body
+
+    try{
+        const article = await Article.findOne({ where: { articleId } })
+
+        article.perex = perex
+        article.title = title
+
+        await article.save()
+
+        return res.json(article)
+    } catch(err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
 app.listen({ port: 3001 }, async () => {
     console.log('Server is listening on http://localhost:3001')
 
