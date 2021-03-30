@@ -25,7 +25,7 @@ app.post('/tenants', async (req, res) => {
 
 
 app.get('/tenants/:tenantId', async (req, res) => {
-    const tenantId = req.params.tenantId
+    const { tenantId } = req.params
 
     try{
         const user = await User.findOne({ where: { tenantId } })
@@ -56,7 +56,7 @@ app.post('/articles', async (req, res) => {
 })
 
 app.get('/articles/:articleId', async (req, res) => {
-    const articleId = req.params.articleId
+    const { articleId } = req.params
 
     try{
         const article = await Article.findOne({ where: { articleId } })
@@ -82,7 +82,7 @@ app.get('/articles', async (req, res) => {
 })
 
 app.delete('/articles/:articleId', async (req, res) => {
-    const articleId = req.params.articleId
+    const { articleId } = req.params
 
     try{
         const article = await Article.findOne({ where: { articleId } })
@@ -98,14 +98,19 @@ app.delete('/articles/:articleId', async (req, res) => {
 })
 
 app.patch('/articles/:articleId', async (req, res) => {
-    const articleId = req.params.articleId
+    const { articleId } = req.params
     const { title, perex } = req.body
 
     try{
         const article = await Article.findOne({ where: { articleId } })
 
-        perex ? article.perex = perex : false
-        title ? article.title = title : false
+        if(perex) {
+            article.perex = perex
+        }
+
+        if(title) {
+            article.title = title
+        }
 
         await article.save()
 
