@@ -28,9 +28,7 @@ app.get('/tenants/:tenantId', async (req, res) => {
     const tenantId = req.params.tenantId
 
     try{
-        const user = await User.findOne({ 
-            where: { tenantId }
-        })
+        const user = await User.findOne({ where: { tenantId } })
 
         return res.json(user)
     } catch(err) {
@@ -61,9 +59,7 @@ app.get('/articles/:articleId', async (req, res) => {
     const articleId = req.params.articleId
 
     try{
-        const article = await Article.findOne({ 
-            where: { articleId }
-        })
+        const article = await Article.findOne({ where: { articleId } })
 
         return res.json(article)
     } catch(err) {
@@ -79,6 +75,22 @@ app.get('/articles', async (req, res) => {
 
         return res.json(articles)
     } catch (err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
+app.delete('/articles/:articleId', async (req, res) => {
+    const articleId = req.params.articleId
+
+    try{
+        const article = await Article.findOne({ where: { articleId } })
+
+        await article.destroy()
+
+        return res.json({ message: 'Article deleted!' })
+    } catch(err) {
         console.log(err)
 
         return res.status(500).json({ error: 'Something went wrong' })
