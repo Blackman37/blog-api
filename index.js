@@ -39,18 +39,35 @@ app.get('/tenants/:tenantId', async (req, res) => {
 })
 
 app.post('/articles', async (req, res) => {
-    const { tenantId, title, perex } = req.body
+    const { title, perex } = req.body
 
     try {
-        const user = await User.findOne({ where: { tenantId: tenantId }})
+        // const user = await User.findOne({ where: { tenantId: tenantId }})
 
-        const article = await Article.create({ title, perex, userId: user.id })
+        // const article = await Article.create({ title, perex, userId: user.id })
+        const article = await Article.create({ title, perex })
 
         return res.status(201).json(article)
     } catch(err) {
         console.log(err)
 
         return res.status(500).json({ error: 'Something went wrong '})
+    }
+})
+
+app.get('/articles/:articleId', async (req, res) => {
+    const articleId = req.params.articleId
+
+    try{
+        const article = await Article.findOne({ 
+            where: { articleId }
+        })
+
+        return res.json(article)
+    } catch(err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong' })
     }
 })
 
