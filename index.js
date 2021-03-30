@@ -97,15 +97,15 @@ app.delete('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.put('/articles/:articleId', async (req, res) => {
+app.patch('/articles/:articleId', async (req, res) => {
     const articleId = req.params.articleId
     const { title, perex } = req.body
 
     try{
         const article = await Article.findOne({ where: { articleId } })
 
-        article.perex = perex
-        article.title = title
+        perex ? article.perex = perex : false
+        title ? article.title = title : false
 
         await article.save()
 
