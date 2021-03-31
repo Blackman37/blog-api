@@ -131,7 +131,7 @@ app.post('/comments', async (req, res) => {
     const { tenantId, content, articleId } = req.body
 
     try {
-        const user = await User.findOne({ where: { tenantId: tenantId }})
+        const user = await User.findOne({ where: { tenantId } })
         const article = await Article.findOne({ where: { articleId } })
         const comment = await Comment.create({ content, userId: user.id, articleId: article.id })
 
