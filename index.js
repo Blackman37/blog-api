@@ -136,13 +136,14 @@ app.patch('/articles/:articleId', async (req, res) => {
 })
 
 app.post('/comments', async (req, res) => {
-    const { tenantId, content } = req.body
+    const { tenantId, content, articleId } = req.body
 
     try {
         const user = await User.findOne({ where: { tenantId: tenantId }})
-        const comment = await Comment.create({ content, userId: user.id })
+        const article = await Article.findOne({ where: { articleId } })
+        const comment = await Comment.create({ content, userId: user.id, articleId: article.id })
 
-        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
+        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username }, { articleId: article.toJSON().articleId })
 
         return res.status(201).json(articleWithAuthor)
     } catch (err) {
