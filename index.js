@@ -20,7 +20,7 @@ app.post('/login', auth, async (req, res) => {
             return res.status(401).json({ message: 'API key missing or invalid' })
         }
 
-
+        // has right credentials? Then send HTTP request
         if (user.username === username && user.password === password) {
             request({
                 method: 'POST',
@@ -56,6 +56,7 @@ app.post('/login', auth, async (req, res) => {
 app.post('/tenants', async (req, res) => {
     const { username, password } = req.body
 
+    // write to db new user
     try {
         const user = await User.create({ username, password })
 
@@ -71,6 +72,7 @@ app.post('/tenants', async (req, res) => {
 app.get('/tenants/:tenantId', async (req, res) => {
     const { tenantId } = req.params
 
+    // get user from db with concrete ID
     try {
         const user = await User.findOne({ where: { tenantId } })
 
@@ -85,6 +87,7 @@ app.get('/tenants/:tenantId', async (req, res) => {
 app.post('/articles', checkJwt, async (req, res) => {
     const { title, perex } = req.body
 
+    // create article to db with params from body
     try {
         const article = await Article.create({ title, perex })
 
@@ -99,6 +102,7 @@ app.post('/articles', checkJwt, async (req, res) => {
 app.get('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
 
+    // get concrete article
     try {
         const article = await Article.findOne({ where: { articleId } })
 
@@ -116,12 +120,15 @@ app.get('/articles', checkJwt, async (req, res) => {
 
         let articles
 
+        // PAGINATION
+        // If exist limit from user, use them
         if (limit > 0) {
             articles = await Article.findAndCountAll({
                 limit: limit,
                 offset: offset,
             })
-
+        
+        // Else return all articles without pagination
         } else {
             articles = await Article.findAndCountAll()
         }
@@ -137,6 +144,7 @@ app.get('/articles', checkJwt, async (req, res) => {
 app.delete('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
 
+    // Find concrete article and destry him
     try {
         const article = await Article.findOne({ where: { articleId } })
 
@@ -154,6 +162,7 @@ app.patch('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
     const { title, perex } = req.body
 
+    // Find concrete article, take non empty value and update them
     try {
         const article = await Article.findOne({ where: { articleId } })
 
@@ -178,11 +187,13 @@ app.patch('/articles/:articleId', checkJwt, async (req, res) => {
 app.post('/comments', checkJwt, async (req, res) => {
     const { tenantId, content, articleId } = req.body
 
+    // 3 query to db - it is helpfull query. As first I have tenant id, then I have article id and last create new comment with this data
     try {
         const user = await User.findOne({ where: { tenantId } })
         const article = await Article.findOne({ where: { articleId } })
         const comment = await Comment.create({ content, userId: user.id, articleId: article.id })
 
+        // response is with author and article ID
         const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username }, { articleId: article.toJSON().articleId })
 
         return res.status(201).json(articleWithAuthor)
@@ -196,12 +207,14 @@ app.post('/comments', checkJwt, async (req, res) => {
 app.post('/comments/:commentId/vote/up', checkJwt, async (req, res) => {
     const { commentId } = req.params
 
+    // Increase score by 1 
     try {
         await Comment.increment('score', { where: { commentId } });
 
         const comment = await Comment.findOne({ where: { commentId } })
         const user = await User.findOne({ where: { id: comment.userId } })
-
+        
+        // add more rows with information to final JSON, from other tables
         const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
         return res.status(201).json(articleWithAuthor)
@@ -214,12 +227,14 @@ app.post('/comments/:commentId/vote/up', checkJwt, async (req, res) => {
 app.post('/comments/:commentId/vote/down', checkJwt, async (req, res) => {
     const { commentId } = req.params
 
+    // Decrease score by 1
     try {
         await Comment.decrement('score', { where: { commentId } });
 
         const comment = await Comment.findOne({ where: { commentId } })
         const user = await User.findOne({ where: { id: comment.userId } })
 
+        // add more rows with information to final JSON, from other tables
         const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
         return res.status(201).json(articleWithAuthor)

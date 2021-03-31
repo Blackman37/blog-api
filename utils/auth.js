@@ -3,7 +3,7 @@ const jwksRsa = require('jwks-rsa')
 require('dotenv').config()
 
 function auth(req, res, next) {
-    // validation: is uuid?
+    // validation: is uuid? If true, then contintue || If false, then return status 401
     const uuidV4Regex = /^[A-F\d]{8}-[A-F\d]{4}-4[A-F\d]{3}-[89AB][A-F\d]{3}-[A-F\d]{12}$/i;
     const isValidV4UUID = uuid => uuidV4Regex.test(uuid);
 
