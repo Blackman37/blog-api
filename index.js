@@ -1,13 +1,56 @@
 const express = require('express')
+const request = require('request')
+require('dotenv').config()
 const { sequelize, User, Article, Comment } = require('./models')
-const { auth } = require('./utils/auth')
+const { auth, checkJwt } = require('./utils/auth')
 
 const app = express()
 const PORT = process.env.PORT || 3001
 app.use(express.json())
 
 app.post('/login', auth, async (req, res) => {
-    return res.json({ message: 'Auth is OK'})
+    const { username, password } = req.body
+
+    try {
+        // find user with apiKey from header
+        const user = await User.findOne({ where: { apiKey: req.header('x-api-key') } })
+
+        // is existing user?
+        if(!user) {
+            return res.status(401).json({ message: 'API key missing or invalid' })
+        }
+
+
+        if (user.username === username && user.password === password) {
+            request({
+                method: 'POST',
+                url: 'https://blackman37.eu.auth0.com/oauth/token',
+                headers: { 'content-type': 'application/json' },
+                form: {
+                    grant_type: 'client_credentials',
+                    client_id: process.env.AUTH0_CLIENT_ID,
+                    client_secret: process.env.AUTH0_CLIENT_SECRET,
+                    audience: 'https://applifting.app'
+                }
+            }, function (error, response, body) {
+                if (error) {
+                    return res.status(500).json({ message: 'Something went wrong' })
+                }
+                return res.status(201).send(body)
+            })
+
+
+        } else {
+            return res.status(400).json({
+                code: "INVALID_CREDENTIALS",
+                message: "Password is invalid"
+              })
+        }
+
+        
+    } catch (error) {
+        return res.send(error)
+    }
 })
 
 app.post('/tenants', async (req, res) => {
@@ -39,7 +82,7 @@ app.get('/tenants/:tenantId', async (req, res) => {
     }
 })
 
-app.post('/articles', async (req, res) => {
+app.post('/articles', checkJwt, async (req, res) => {
     const { title, perex } = req.body
 
     try {
@@ -67,7 +110,7 @@ app.get('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.get('/articles', async (req, res) => {
+app.get('/articles', checkJwt, async (req, res) => {
     try {
         const { offset = 0, limit = 0 } = req.query
 
@@ -140,7 +183,7 @@ app.post('/comments', async (req, res) => {
         const article = await Article.findOne({ where: { articleId } })
         const comment = await Comment.create({ content, userId: user.id, articleId: article.id })
 
-        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username }, { articleId: article.toJSON().articleId })
+        const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username }, { articleId: article.toJSON().articleId })
 
         return res.status(201).json(articleWithAuthor)
     } catch (err) {
@@ -157,14 +200,14 @@ app.post('/comments/:commentId/vote/up', async (req, res) => {
         await Comment.increment('score', { where: { commentId } });
 
         const comment = await Comment.findOne({ where: { commentId } })
-        const user = await User.findOne({ where: { id: comment.userId }})
+        const user = await User.findOne({ where: { id: comment.userId } })
 
-        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
+        const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
         return res.json(articleWithAuthor)
- 
+
     } catch (err) {
-        
+
     }
 })
 
@@ -175,14 +218,14 @@ app.post('/comments/:commentId/vote/down', async (req, res) => {
         await Comment.decrement('score', { where: { commentId } });
 
         const comment = await Comment.findOne({ where: { commentId } })
-        const user = await User.findOne({ where: { id: comment.userId }})
+        const user = await User.findOne({ where: { id: comment.userId } })
 
-        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
+        const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
         return res.json(articleWithAuthor)
- 
+
     } catch (err) {
-        
+
     }
 })
 
