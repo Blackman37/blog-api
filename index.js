@@ -143,7 +143,10 @@ app.post('/comment', async (req, res) => {
 
         const comment = await Comment.create({ content, userId: user.id })
 
-        return res.status(201).json(comment)
+        const author = { Author: user.toJSON() }
+        const articleWithAuthor = { ...comment.toJSON(), ...author}
+
+        return res.status(201).json(articleWithAuthor)
     } catch (err) {
         console.log(err)
 
