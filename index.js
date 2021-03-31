@@ -2,6 +2,7 @@ const express = require('express')
 const { sequelize, User, Article, Comment } = require('./models')
 
 const app = express()
+const PORT = 3001
 app.use(express.json())
 
 
@@ -181,7 +182,7 @@ app.post('/comments/:commentId/vote/down', async (req, res) => {
     }
 })
 
-// Routes for images are not complete. I add only notes how to do it
+// Routes for images are not complete. I add only notes how to do it. All routes will work with binary files
 app.get('/images/:imageId', async (req, res) => {
 
     // Here will be a new table and imageID from params
@@ -205,8 +206,8 @@ app.delete('/images/:imageId', async (req, res) => {
 
 })
 
-app.listen({ port: 3001 }, async () => {
-    console.log('Server is listening on http://localhost:3001')
+app.listen(PORT, async () => {
+    console.log(`Server is running on port ${PORT}`)
 
     await sequelize.authenticate()
     console.log('Database synced!')
