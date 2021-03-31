@@ -96,7 +96,7 @@ app.post('/articles', checkJwt, async (req, res) => {
     }
 })
 
-app.get('/articles/:articleId', async (req, res) => {
+app.get('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
 
     try {
@@ -134,7 +134,7 @@ app.get('/articles', checkJwt, async (req, res) => {
     }
 })
 
-app.delete('/articles/:articleId', async (req, res) => {
+app.delete('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
 
     try {
@@ -150,7 +150,7 @@ app.delete('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.patch('/articles/:articleId', async (req, res) => {
+app.patch('/articles/:articleId', checkJwt, async (req, res) => {
     const { articleId } = req.params
     const { title, perex } = req.body
 
@@ -175,7 +175,7 @@ app.patch('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.post('/comments', async (req, res) => {
+app.post('/comments', checkJwt, async (req, res) => {
     const { tenantId, content, articleId } = req.body
 
     try {
@@ -193,7 +193,7 @@ app.post('/comments', async (req, res) => {
     }
 })
 
-app.post('/comments/:commentId/vote/up', async (req, res) => {
+app.post('/comments/:commentId/vote/up', checkJwt, async (req, res) => {
     const { commentId } = req.params
 
     try {
@@ -211,7 +211,7 @@ app.post('/comments/:commentId/vote/up', async (req, res) => {
     }
 })
 
-app.post('/comments/:commentId/vote/down', async (req, res) => {
+app.post('/comments/:commentId/vote/down', checkJwt, async (req, res) => {
     const { commentId } = req.params
 
     try {
@@ -230,7 +230,7 @@ app.post('/comments/:commentId/vote/down', async (req, res) => {
 })
 
 // Routes for images are not complete. I add only notes how to do it. All routes will work with binary files
-app.get('/images/:imageId', async (req, res) => {
+app.get('/images/:imageId', checkJwt, async (req, res) => {
 
     // Here will be a new table and imageID from params
     // As first will read from table Image name of concrete image file (now doesn't exists table)
@@ -239,7 +239,7 @@ app.get('/images/:imageId', async (req, res) => {
 
 })
 
-app.post('/images/:imageId', async (req, res) => {
+app.post('/images/:imageId', checkJwt, async (req, res) => {
 
     // Here will write to table images a new row. This row will have a imageId and imageName - both in uuid
     // as next the file will save via fs library with new name (generated uuid) - because older files could be overwites
@@ -247,7 +247,7 @@ app.post('/images/:imageId', async (req, res) => {
 
 })
 
-app.delete('/images/:imageId', async (req, res) => {
+app.delete('/images/:imageId', checkJwt, async (req, res) => {
 
     // Similar as post route, only as first should delete a file and then will delete from table
 
