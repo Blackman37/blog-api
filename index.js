@@ -1,10 +1,14 @@
 const express = require('express')
 const { sequelize, User, Article, Comment } = require('./models')
+const { auth } = require('./utils/auth')
 
 const app = express()
 const PORT = process.env.PORT || 3001
 app.use(express.json())
 
+app.post('/login', auth, async (req, res) => {
+    return res.json({ message: 'Auth is OK'})
+})
 
 app.post('/tenants', async (req, res) => {
     const { username, password } = req.body
