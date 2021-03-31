@@ -135,22 +135,56 @@ app.patch('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.post('/comment', async (req, res) => {
+app.post('/comments', async (req, res) => {
     const { tenantId, content } = req.body
 
     try {
         const user = await User.findOne({ where: { tenantId: tenantId }})
-
         const comment = await Comment.create({ content, userId: user.id })
 
-        const author = { Author: user.toJSON() }
-        const articleWithAuthor = { ...comment.toJSON(), ...author}
+        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
 
         return res.status(201).json(articleWithAuthor)
     } catch (err) {
         console.log(err)
 
         return res.status(400).json(err)
+    }
+})
+
+app.post('/comments/:commentId/vote/up', async (req, res) => {
+    const { commentId } = req.params
+
+    try {
+        await Comment.increment('score', { where: { commentId } });
+
+        const comment = await Comment.findOne({ where: { commentId } })
+        const user = await User.findOne({ where: { id: comment.userId }})
+
+        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
+
+        return res.json(articleWithAuthor)
+ 
+    } catch (err) {
+        
+    }
+})
+
+app.post('/comments/:commentId/vote/down', async (req, res) => {
+    const { commentId } = req.params
+
+    try {
+        await Comment.decrement('score', { where: { commentId } });
+
+        const comment = await Comment.findOne({ where: { commentId } })
+        const user = await User.findOne({ where: { id: comment.userId }})
+
+        const articleWithAuthor = Object.assign( comment.toJSON(), { author: user.toJSON().username })
+
+        return res.json(articleWithAuthor)
+ 
+    } catch (err) {
+        
     }
 })
 

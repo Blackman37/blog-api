@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate({ User }) {
       // define association here
       
-      this.belongsTo(User, { foreignKey: 'userId' })
+      this.belongsTo(User, { foreignKey: 'userId', as: 'user' })
     }
 
     toJSON(){
@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     score: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
-      validate: { min: 0, max: 200 }
+      validate: { min: 0, max: 500 }
     }
   }, {
     sequelize,
