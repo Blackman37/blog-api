@@ -1,10 +1,5 @@
 const express = require('express')
 const { sequelize, User, Article, Comment } = require('./models')
-const article = require('./models/article')
-const user = require('./models/user')
-const comment = require('./models/comment')
-
-
 
 const app = express()
 app.use(express.json())
