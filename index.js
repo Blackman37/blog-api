@@ -43,9 +43,6 @@ app.post('/articles', async (req, res) => {
     const { title, perex } = req.body
 
     try {
-        // const user = await User.findOne({ where: { tenantId: tenantId }})
-
-        // const article = await Article.create({ title, perex, userId: user.id })
         const article = await Article.create({ title, perex })
 
         return res.status(201).json(article)
@@ -187,6 +184,30 @@ app.post('/comments/:commentId/vote/down', async (req, res) => {
     } catch (err) {
         
     }
+})
+
+// Routes for images are not complete. I add only notes how to do it
+app.get('/images/:imageId', async (req, res) => {
+
+    // Here will be a new table and imageID from params
+    // As first will read from table Image name of concrete image file (now doesn't exists table)
+    // then send a file from route below (__dirname + '/images/' + nameOfFileFromTable)
+    // res.sendFile(__dirname + '/images/image1.png')
+
+})
+
+app.post('/images/:imageId', async (req, res) => {
+
+    // Here will write to table images a new row. This row will have a imageId and imageName - both in uuid
+    // as next the file will save via fs library with new name (generated uuid) - because older files could be overwites
+    // Last step will be load file and send via res.sendFile
+
+})
+
+app.delete('/images/:imageId', async (req, res) => {
+
+    // Similar as post route, only as first should delete a file and then will delete from table
+
 })
 
 app.listen({ port: 3001 }, async () => {
