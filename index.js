@@ -142,7 +142,7 @@ app.delete('/articles/:articleId', checkJwt, async (req, res) => {
 
         await article.destroy()
 
-        return res.json({ message: 'Article deleted!' })
+        return res.status(204).json({ message: 'Article deleted!' })
     } catch (err) {
         console.log(err)
 
@@ -204,7 +204,7 @@ app.post('/comments/:commentId/vote/up', checkJwt, async (req, res) => {
 
         const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
-        return res.json(articleWithAuthor)
+        return res.status(201).json(articleWithAuthor)
 
     } catch (err) {
 
@@ -222,7 +222,7 @@ app.post('/comments/:commentId/vote/down', checkJwt, async (req, res) => {
 
         const articleWithAuthor = Object.assign(comment.toJSON(), { author: user.toJSON().username })
 
-        return res.json(articleWithAuthor)
+        return res.status(201).json(articleWithAuthor)
 
     } catch (err) {
 
