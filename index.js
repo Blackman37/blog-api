@@ -25,7 +25,7 @@ app.post('/login', hasValidApiKeyHeader, async (req, res) => {
             })
         }        
     } catch (error) {
-        return res.send(error)
+        return res.status(500).json(err)
     }
 })
 
@@ -60,37 +60,7 @@ app.get('/tenants/:tenantId', async (req, res) => {
     }
 })
 
-app.post('/articles', async (req, res) => {
-    const { title, perex } = req.body
-
-    // create article to db with params from body
-    try {
-        const article = await Article.create({ title, perex })
-
-        return res.status(201).json(article)
-    } catch (err) {
-        console.log(err)
-
-        return res.status(400).json(err)
-    }
-})
-
-app.get('/articles/:articleId', async (req, res) => {
-    const { articleId } = req.params
-
-    // get concrete article
-    try {
-        const article = await Article.findOne({ where: { articleId } })
-
-        return res.json(article)
-    } catch (err) {
-        console.log(err)
-
-        return res.status(500).json({ error: 'Something went wrong' })
-    }
-})
-
-app.get('/articles', hasValidJwt, async (req, res) => {
+app.get('/articles', hasValidApiKeyHeader, async (req, res) => {
     try {
         const { offset = 0, limit = 0 } = req.query
 
@@ -117,7 +87,37 @@ app.get('/articles', hasValidJwt, async (req, res) => {
     }
 })
 
-app.delete('/articles/:articleId', async (req, res) => {
+app.post('/articles', hasValidJwt, hasValidApiKeyHeader, async (req, res) => {
+    const { title, perex } = req.body
+
+    // create article to db with params from body
+    try {
+        const article = await Article.create({ title, perex })
+
+        return res.json(article)
+    } catch (err) {
+        console.log(err)
+
+        return res.status(400).json(err)
+    }
+})
+
+app.get('/articles/:articleId', hasValidApiKeyHeader, async (req, res) => {
+    const { articleId } = req.params
+
+    // get concrete article
+    try {
+        const article = await Article.findOne({ where: { articleId } })
+
+        return res.json(article)
+    } catch (err) {
+        console.log(err)
+
+        return res.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
+app.delete('/articles/:articleId', hasValidApiKeyHeader, hasValidJwt, async (req, res) => {
     const { articleId } = req.params
 
     // Find concrete article and destry him
@@ -134,7 +134,7 @@ app.delete('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.patch('/articles/:articleId', async (req, res) => {
+app.patch('/articles/:articleId', hasValidJwt, hasValidApiKeyHeader, async (req, res) => {
     const { articleId } = req.params
     const { title, perex } = req.body
 
@@ -160,7 +160,7 @@ app.patch('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.post('/comments', async (req, res) => {
+app.post('/comments', hasValidApiKeyHeader, async (req, res) => {
     const { tenantId, content, articleId } = req.body
 
     // 3 query to db - it is helpfull query. As first I have tenant id, then I have article id and last create new comment with this data
@@ -176,11 +176,11 @@ app.post('/comments', async (req, res) => {
     } catch (err) {
         console.log(err)
 
-        return res.status(400).json(err)
+        return res.status(500).json({ error: 'Something went wrong' })
     }
 })
 
-app.post('/comments/:commentId/vote/up', async (req, res) => {
+app.post('/comments/:commentId/vote/up', hasValidApiKeyHeader, async (req, res) => {
     const { commentId } = req.params
 
     // Increase score by 1 
@@ -197,10 +197,11 @@ app.post('/comments/:commentId/vote/up', async (req, res) => {
 
     } catch (err) {
 
+        return res.status(500).json({ error: 'Something went wrong' })
     }
 })
 
-app.post('/comments/:commentId/vote/down', async (req, res) => {
+app.post('/comments/:commentId/vote/down', hasValidApiKeyHeader, async (req, res) => {
     const { commentId } = req.params
 
     // Decrease score by 1
