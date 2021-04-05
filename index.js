@@ -2,24 +2,18 @@ const express = require('express')
 const request = require('request')
 require('dotenv').config()
 const { sequelize, User, Article, Comment } = require('./models')
-const { auth, generateAccessToken, hasUserValidJwt } = require('./utils/auth')
+const { hasValidApiKeyHeader, generateAccessToken, hasValidJwt } = require('./utils/auth')
 
 const app = express()
 const PORT = process.env.PORT || 3001
 app.use(express.json())
 
-app.post('/login', auth, async (req, res) => {
+app.post('/login', hasValidApiKeyHeader, async (req, res) => {
     const { username, password } = req.body
 
+    const user = req.user
+
     try {
-        // find user with apiKey from header
-        const user = await User.findOne({ where: { apiKey: req.header('x-api-key') } })
-
-        // is existing user?
-        if(!user) {
-            return res.status(401).json({ message: 'API key missing or invalid' })
-        }
-
         if (user.username === username && user.password === password) {
         const wholeToken = generateAccessToken({ username: username })
 
@@ -96,7 +90,7 @@ app.get('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.get('/articles', hasUserValidJwt, async (req, res) => {
+app.get('/articles', hasValidJwt, async (req, res) => {
     try {
         const { offset = 0, limit = 0 } = req.query
 
