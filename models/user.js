@@ -23,15 +23,18 @@ module.exports = (sequelize, DataTypes) => {
   User.init({
     tenantId: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
+      unique: true,
     },
     apiKey: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+      unique: true,
     },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         notNull: { msg: 'User must have a username' },
         notEmpty: { msg: 'Username must not be empty' }
