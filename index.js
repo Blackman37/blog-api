@@ -2,7 +2,7 @@ const express = require('express')
 const request = require('request')
 require('dotenv').config()
 const { sequelize, User, Article, Comment } = require('./models')
-const { auth, generateAccessToken } = require('./utils/auth')
+const { auth, generateAccessToken, hasUserValidJwt } = require('./utils/auth')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -21,9 +21,9 @@ app.post('/login', auth, async (req, res) => {
         }
 
         if (user.username === username && user.password === password) {
-        const allToken = generateAccessToken({ username: username })
+        const wholeToken = generateAccessToken({ username: username })
 
-        return res.status(201).json(allToken)
+        return res.status(201).json(wholeToken)
         } else {
             return res.status(400).json({
                 code: "INVALID_CREDENTIALS",
@@ -96,7 +96,7 @@ app.get('/articles/:articleId', async (req, res) => {
     }
 })
 
-app.get('/articles', async (req, res) => {
+app.get('/articles', hasUserValidJwt, async (req, res) => {
     try {
         const { offset = 0, limit = 0 } = req.query
 

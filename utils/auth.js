@@ -30,18 +30,32 @@ function generateAccessToken(username) {
       };
 }
 
-// // Middleware function - is token valid?
-// const checkJwt = jwt({
-//     secret: jwksRsa.expressJwtSecret({
-//         cache: true,
-//         rateLimit: true,
-//         jwksRequestsPerMinute: 5,
-//         jwksUri: 'https://blackman37.eu.auth0.com/.well-known/jwks.json'
-//     }),
-//     audience: 'https://applifting.app',
-//     issuer: 'https://blackman37.eu.auth0.com/',
-//     algorithms: ['RS256']
-// })
+function hasUserValidJwt(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+  
+    const unauthorizedSendJson = () => {
+        res.status(403).json({
+          code: 'UNAUTHORIZED',
+          message: 'Access token is missing, invalid or expired'
+        })
+    }
+  
+    if (token == null) return unauthorizedSendJson()
+  
+    jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
+  
+  
+      if(user) {
+          req.user = user
+          console.log(user)
+      } else {
+          console.log(error)
+          return unauthorizedSendJson()
+      }
+  
+      next()
+    })
+  }
 
-
-module.exports = { auth, generateAccessToken }
+module.exports = { auth, generateAccessToken, hasUserValidJwt }
